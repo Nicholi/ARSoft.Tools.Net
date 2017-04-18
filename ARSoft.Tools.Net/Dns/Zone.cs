@@ -85,7 +85,12 @@ namespace ARSoft.Tools.Net.Dns
 		/// <returns>A new instance of the Zone class</returns>
 		public static Zone ParseMasterFile(DomainName name, string zoneFile)
 		{
+#if NETSTANDARD
+		    using (var fileStream = new FileStream(zoneFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (StreamReader reader = new StreamReader(fileStream))
+#else
 			using (StreamReader reader = new StreamReader(zoneFile))
+#endif
 			{
 				return ParseMasterFile(name, reader);
 			}
@@ -135,15 +140,15 @@ namespace ARSoft.Tools.Net.Dns
 				{
 					string[] parts = _lineSplitterRegex.Matches(line).Cast<Match>().Select(x => x.Groups.Cast<Group>().Last(g => g.Success).Value.FromMasterfileLabelRepresentation()).ToArray();
 
-					if (parts[0].Equals("$origin", StringComparison.InvariantCultureIgnoreCase))
+					if (parts[0].Equals("$origin", NetStandardExtensionFixes.GetDefaultIgnoreCaseComparison()))
 					{
 						origin = DomainName.ParseFromMasterfile(parts[1]);
 					}
-					if (parts[0].Equals("$ttl", StringComparison.InvariantCultureIgnoreCase))
+					if (parts[0].Equals("$ttl", NetStandardExtensionFixes.GetDefaultIgnoreCaseComparison()))
 					{
 						ttl = Int32.Parse(parts[1]);
 					}
-					if (parts[0].Equals("$include", StringComparison.InvariantCultureIgnoreCase))
+					if (parts[0].Equals("$include", NetStandardExtensionFixes.GetDefaultIgnoreCaseComparison()))
 					{
 						FileStream fileStream = reader.BaseStream as FileStream;
 
@@ -155,7 +160,12 @@ namespace ARSoft.Tools.Net.Dns
 
 						DomainName includeOrigin = (parts.Length > 2) ? DomainName.ParseFromMasterfile(parts[2]) : origin;
 
+#if NETSTANDARD
+                        using (var newFileStreamPath = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        using (StreamReader includeReader = new StreamReader(newFileStreamPath))
+#else
 						using (StreamReader includeReader = new StreamReader(path))
+#endif
 						{
 							records.AddRange(ParseRecords(includeReader, includeOrigin, ttl, lastRecord));
 						}

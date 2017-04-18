@@ -30,6 +30,7 @@ namespace ARSoft.Tools.Net.Dns
 	/// </summary>
 	public interface IDnsResolver
 	{
+#if !NETSTANDARD
 		/// <summary>
 		///   Queries a dns resolver for specified records.
 		/// </summary>
@@ -40,6 +41,7 @@ namespace ARSoft.Tools.Net.Dns
 		/// <returns> A list of matching <see cref="DnsRecordBase">records</see> </returns>
 		List<T> Resolve<T>(DomainName name, RecordType recordType = RecordType.A, RecordClass recordClass = RecordClass.INet)
 			where T : DnsRecordBase;
+#endif
 
 		/// <summary>
 		///   Queries a dns resolver for specified records as an asynchronous operation.

@@ -117,6 +117,7 @@ namespace ARSoft.Tools.Net.Net
 			return TlsaRecord.GetCertificateAssocicationData(tlsaRecord.Selector, tlsaRecord.MatchingType, certificate).SequenceEqual(tlsaRecord.CertificateAssociationData);
 		}
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Closes the current stream and releases any resources.
 		/// </summary>
@@ -124,7 +125,9 @@ namespace ARSoft.Tools.Net.Net
 		{
 			_sslStream.Close();
 		}
+#endif
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Called by clients to authenticate the server and optionally the client in a client-server connection.
 		/// </summary>
@@ -142,6 +145,7 @@ namespace ARSoft.Tools.Net.Net
 			_tlsaRecords = _resolver.ResolveSecure<TlsaRecord>(DomainName.Parse("_" + port + "._" + EnumHelper<ProtocolType>.ToString(protocol).ToLower() + "." + targetHost), RecordType.Tlsa);
 			_sslStream.AuthenticateAsClient(targetHost, clientCertificates ?? new X509CertificateCollection(), enabledSslProtocols, checkCertificateRevocation);
 		}
+#endif
 
 		/// <summary>
 		///   Called by clients to authenticate the server and optionally the client in a client-server connection.
@@ -155,7 +159,13 @@ namespace ARSoft.Tools.Net.Net
 		///   A Boolean value that specifies whether the certificate revocation list is
 		///   checked during authentication.
 		/// </param>
-		public async Task AuthenticateAsClientAsync(string targetHost, int port, ProtocolType protocol = ProtocolType.Tcp, X509CertificateCollection clientCertificates = null, SslProtocols enabledSslProtocols = SslProtocols.Default, bool checkCertificateRevocation = false)
+		public async Task AuthenticateAsClientAsync(string targetHost, int port, ProtocolType protocol = ProtocolType.Tcp, X509CertificateCollection clientCertificates = null, SslProtocols enabledSslProtocols =
+#if NETSTANDARD
+            SslProtocols.Tls,
+#else
+            SslProtocols.Default,
+#endif
+            bool checkCertificateRevocation = false)
 		{
 			_tlsaRecords = await _resolver.ResolveSecureAsync<TlsaRecord>(DomainName.Parse("_" + port + "._" + EnumHelper<ProtocolType>.ToString(protocol).ToLower() + "." + targetHost), RecordType.Tlsa);
 			await _sslStream.AuthenticateAsClientAsync(targetHost, clientCertificates ?? new X509CertificateCollection(), enabledSslProtocols, checkCertificateRevocation);
@@ -218,6 +228,7 @@ namespace ARSoft.Tools.Net.Net
 			_sslStream.Write(buffer, offset, count);
 		}
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Begins an asynchronous read operation that reads data from the stream and stores it in the specified array.
 		/// </summary>
@@ -276,6 +287,7 @@ namespace ARSoft.Tools.Net.Net
 		{
 			_sslStream.EndWrite(asyncResult);
 		}
+#endif
 
 		/// <summary>
 		///   Gets the TransportContext used for authentication using extended protection.

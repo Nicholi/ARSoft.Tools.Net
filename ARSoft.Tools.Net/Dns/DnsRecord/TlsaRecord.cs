@@ -225,11 +225,28 @@ namespace ARSoft.Tools.Net.Dns
 			switch (selector)
 			{
 				case TlsaSelector.FullCertificate:
+#if NETSTANDARD
+				    if (!(certificate is System.Security.Cryptography.X509Certificates.X509Certificate2))
+				    {
+                        // what do?
+				        throw new NotImplementedException("X509Certificate unsupported, use X509Certificate2");
+                    }
+				    selectedBytes = ((System.Security.Cryptography.X509Certificates.X509Certificate2)certificate).RawData;
+#else
 					selectedBytes = certificate.GetRawCertData();
+#endif
 					break;
 
 				case TlsaSelector.SubjectPublicKeyInfo:
+#if NETSTANDARD
+				    if (!(certificate is System.Security.Cryptography.X509Certificates.X509Certificate2))
+				    {
+				        throw new NotImplementedException("X509Certificate unsupported, use X509Certificate2");
+				    }
+                    selectedBytes = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(new X509CertificateParser().ReadCertificate(((System.Security.Cryptography.X509Certificates.X509Certificate2)certificate).RawData).GetPublicKey()).GetDerEncoded();
+#else
 					selectedBytes = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(DotNetUtilities.FromX509Certificate(certificate).GetPublicKey()).GetDerEncoded();
+#endif
 					break;
 
 				default:

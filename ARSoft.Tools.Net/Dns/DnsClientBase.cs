@@ -77,6 +77,7 @@ namespace ARSoft.Tools.Net.Dns
 
 		protected virtual bool IsTcpEnabled { get; set; }
 
+#if !NETSTANDARD
 		protected TMessage SendMessage<TMessage>(TMessage message)
 			where TMessage : DnsMessageBase, new()
 		{
@@ -215,6 +216,7 @@ namespace ARSoft.Tools.Net.Dns
 
 			return null;
 		}
+#endif
 
 		protected List<TMessage> SendMessageParallel<TMessage>(TMessage message)
 			where TMessage : DnsMessageBase, new()
@@ -334,6 +336,7 @@ namespace ARSoft.Tools.Net.Dns
 			}
 		}
 
+#if !NETSTANDARD
 		private byte[] QueryByTcp(IPAddress nameServer, byte[] messageData, int messageLength, ref TcpClient tcpClient, ref NetworkStream tcpStream, out IPAddress responderAddress)
 		{
 			responderAddress = nameServer;
@@ -386,6 +389,7 @@ namespace ARSoft.Tools.Net.Dns
 				return null;
 			}
 		}
+#endif
 
 		private bool TryRead(TcpClient client, NetworkStream stream, byte[] buffer, int length)
 		{
@@ -526,7 +530,9 @@ namespace ARSoft.Tools.Net.Dns
 						try
 						{
 							resultData.TcpStream?.Dispose();
+#if !NETSTANDARD
 							resultData.TcpClient?.Close();
+#endif
 						}
 						catch
 						{
@@ -561,12 +567,18 @@ namespace ARSoft.Tools.Net.Dns
 				{
 					using (UdpClient udpClient = new UdpClient(endpointInfo.LocalAddress.AddressFamily))
 					{
+#if !NETSTANDARD
 						udpClient.Connect(endpointInfo.ServerAddress, _port);
+#endif
 
 						udpClient.Client.SendTimeout = QueryTimeout;
 						udpClient.Client.ReceiveTimeout = QueryTimeout;
 
+#if NETSTANDARD
+						await udpClient.SendAsync(messageData, messageLength, new IPEndPoint(endpointInfo.ServerAddress, _port));
+#else
 						await udpClient.SendAsync(messageData, messageLength);
+#endif
 
 						UdpReceiveResult response = await udpClient.ReceiveAsync(QueryTimeout, token);
 						return new QueryResponse(response.Buffer, response.RemoteEndPoint.Address);

@@ -122,7 +122,11 @@ namespace ARSoft.Tools.Net.Dns.DynamicUpdate
 		protected override void FinishParsing()
 		{
 			Prequisites =
+#if NETSTANDARD
+                AnswerRecords.Select<DnsRecordBase, PrequisiteBase>(
+#else
 				AnswerRecords.ConvertAll<PrequisiteBase>(
+#endif
 					record =>
 					{
 						if ((record.RecordClass == RecordClass.Any) && (record.RecordDataLength == 0))
@@ -152,7 +156,11 @@ namespace ARSoft.Tools.Net.Dns.DynamicUpdate
 					}).Where(prequisite => (prequisite != null)).ToList();
 
 			Updates =
+#if NETSTANDARD
+			    AuthorityRecords.Select<DnsRecordBase, UpdateBase>(
+#else
 				AuthorityRecords.ConvertAll<UpdateBase>(
+#endif
 					record =>
 					{
 						if (record.TimeToLive != 0)

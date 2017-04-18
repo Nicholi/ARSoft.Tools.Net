@@ -137,7 +137,7 @@ namespace ARSoft.Tools.Net.Dns
 					}
 
 				default:
-					if (s.StartsWith("CLASS", StringComparison.InvariantCultureIgnoreCase))
+					if (s.StartsWith("CLASS", NetStandardExtensionFixes.GetDefaultIgnoreCaseComparison()))
 					{
 						ushort classValue;
 						if (UInt16.TryParse(s.Substring(5), out classValue))

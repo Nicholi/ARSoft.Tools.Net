@@ -19,7 +19,7 @@
     <ApplicationVersion>1.2.3.4</ApplicationVersion>
     <TargetFrameworkProfile />
     <OutputPath>bin\$(Configuration)\netframework\</OutputPath>
-	<BaseIntermediateOutputPath>obj\$(Configuration)\netframework\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\$(Configuration)\netframework\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -210,6 +210,7 @@
     <Compile Include="Dns\InvalidSignedMessageEventArgs.cs" />
     <Compile Include="EventHandlerExtensions.cs" />
     <Compile Include="IPAddressExtensions.cs" />
+    <Compile Include="NetStandardExtensionFixes.cs" />
     <Compile Include="Net\DaneStream.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

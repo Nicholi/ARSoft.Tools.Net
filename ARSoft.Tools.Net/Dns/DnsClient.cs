@@ -87,6 +87,7 @@ namespace ARSoft.Tools.Net.Dns
 
 		protected override int MaximumQueryMessageSize => 512;
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Queries a dns server for specified records.
 		/// </summary>
@@ -118,6 +119,7 @@ namespace ARSoft.Tools.Net.Dns
 
 			return SendMessage(message);
 		}
+#endif
 
 		/// <summary>
 		///   Queries a dns server for specified records as an asynchronous operation.
@@ -152,6 +154,7 @@ namespace ARSoft.Tools.Net.Dns
 			return SendMessageAsync(message, token);
 		}
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Send a custom message to the dns server and returns the answer.
 		/// </summary>
@@ -167,6 +170,7 @@ namespace ARSoft.Tools.Net.Dns
 
 			return SendMessage<DnsMessage>(message);
 		}
+#endif
 
 		/// <summary>
 		///   Send a custom message to the dns server and returns the answer as an asynchronous operation.
@@ -185,6 +189,7 @@ namespace ARSoft.Tools.Net.Dns
 			return SendMessageAsync<DnsMessage>(message, token);
 		}
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Send an dynamic update to the dns server and returns the answer.
 		/// </summary>
@@ -200,6 +205,7 @@ namespace ARSoft.Tools.Net.Dns
 
 			return SendMessage(message);
 		}
+#endif
 
 		/// <summary>
 		///   Send an dynamic update to the dns server and returns the answer as an asynchronous operation.
@@ -260,7 +266,15 @@ namespace ARSoft.Tools.Net.Dns
 			}
 
 			// try parsing resolv.conf since getting data by NetworkInterface is not supported on non-windows mono
-			if ((res.Count == 0) && ((Environment.OSVersion.Platform == PlatformID.Unix) || (Environment.OSVersion.Platform == PlatformID.MacOSX)))
+			if ((res.Count == 0) && (
+#if NETSTANDARD
+                System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux) ||
+                System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX)
+#else
+                (Environment.OSVersion.Platform == PlatformID.Unix) || 
+                (Environment.OSVersion.Platform == PlatformID.MacOSX)
+#endif
+                ))
 			{
 				try
 				{

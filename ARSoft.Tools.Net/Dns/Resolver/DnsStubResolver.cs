@@ -68,6 +68,7 @@ namespace ARSoft.Tools.Net.Dns
 		public DnsStubResolver(IEnumerable<IPAddress> servers, int queryTimeout)
 			: this(new DnsClient(servers, queryTimeout)) {}
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Queries a the upstream DNS server(s) for specified records.
 		/// </summary>
@@ -121,6 +122,7 @@ namespace ARSoft.Tools.Net.Dns
 
 			return records;
 		}
+#endif
 
 		/// <summary>
 		///   Queries a the upstream DNS server(s) for specified records as an asynchronous operation.

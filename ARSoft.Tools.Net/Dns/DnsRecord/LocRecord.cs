@@ -230,10 +230,10 @@ namespace ARSoft.Tools.Net.Dns
 				.Match(String.Join(" ", stringRepresentation))
 				.Groups;
 
-			bool latNegative = groups["lat"].Value.Equals("S", StringComparison.InvariantCultureIgnoreCase);
+			bool latNegative = groups["lat"].Value.Equals("S", NetStandardExtensionFixes.GetDefaultIgnoreCaseComparison());
 			Latitude = new Degree(latNegative, groups["latd"].Value, groups["latm"].Value, groups["lats"].Value, groups["latms"].Value);
 
-			bool longNegative = groups["long"].Value.Equals("W", StringComparison.InvariantCultureIgnoreCase);
+			bool longNegative = groups["long"].Value.Equals("W", NetStandardExtensionFixes.GetDefaultIgnoreCaseComparison());
 			Longitude = new Degree(longNegative, groups["longd"].Value, groups["longm"].Value, groups["longs"].Value, groups["longms"].Value);
 
 			Altitude = Double.Parse(groups["alt"].Value, CultureInfo.InvariantCulture);

@@ -824,7 +824,7 @@ namespace ARSoft.Tools.Net.Dns
 			if (EnumHelper<RecordType>.TryParse(s, true, out recordType))
 				return true;
 
-			if (s.StartsWith("TYPE", StringComparison.InvariantCultureIgnoreCase))
+			if (s.StartsWith("TYPE", NetStandardExtensionFixes.GetDefaultIgnoreCaseComparison()))
 			{
 				ushort classValue;
 				if (UInt16.TryParse(s.Substring(4), out classValue))
@@ -846,7 +846,7 @@ namespace ARSoft.Tools.Net.Dns
 			if (EnumHelper<RecordType>.TryParse(s, true, out recordType))
 				return recordType;
 
-			if (s.StartsWith("TYPE", StringComparison.InvariantCultureIgnoreCase))
+			if (s.StartsWith("TYPE", NetStandardExtensionFixes.GetDefaultIgnoreCaseComparison()))
 			{
 				ushort classValue;
 				if (UInt16.TryParse(s.Substring(4), out classValue))

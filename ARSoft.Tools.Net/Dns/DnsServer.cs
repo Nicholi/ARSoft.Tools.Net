@@ -134,7 +134,11 @@ namespace ARSoft.Tools.Net.Dns
 		{
 			if (_udpListenerCount > 0)
 			{
+#if NETSTANDARD
+			    _udpListener.Dispose();
+#else
 				_udpListener.Close();
+#endif
 			}
 			if (_tcpListenerCount > 0)
 			{
@@ -522,7 +526,11 @@ namespace ARSoft.Tools.Net.Dns
 				try
 				{
 					// ReSharper disable once ConstantConditionalAccessQualifier
+#if NETSTANDARD
+				    client?.Dispose();
+#else
 					client?.Close();
+#endif
 				}
 				catch
 				{

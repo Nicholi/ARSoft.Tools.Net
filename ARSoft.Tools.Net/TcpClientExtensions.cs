@@ -29,6 +29,7 @@ namespace ARSoft.Tools.Net
 {
 	internal static class TcpClientExtensions
 	{
+#if !NETSTANDARD
 		public static bool TryConnect(this TcpClient tcpClient, IPEndPoint endPoint, int timeout)
 		{
 			IAsyncResult ar = tcpClient.BeginConnect(endPoint.Address, endPoint.Port, null, null);
@@ -49,6 +50,7 @@ namespace ARSoft.Tools.Net
 				wh.Close();
 			}
 		}
+#endif
 
 		public static async Task<bool> TryConnectAsync(this TcpClient tcpClient, IPAddress address, int port, int timeout, CancellationToken token)
 		{
@@ -60,7 +62,9 @@ namespace ARSoft.Tools.Net
 			if (connectTask.IsCompleted)
 				return true;
 
+#if !NETSTANDARD
 			tcpClient.Close();
+#endif
 			return false;
 		}
 

@@ -63,7 +63,44 @@ namespace ARSoft.Tools.Net.Dns
 		///   Forces to update all hints using the given resolver
 		/// </summary>
 		/// <param name="resolver">The resolver to use for resolving the new hints</param>
-		public void Update(IDnsResolver resolver)
+#if NETSTANDARD
+		public async System.Threading.Tasks.Task UpdateAsync(IDnsResolver resolver)
+		{
+			Zone zone = new Zone(DomainName.Root);
+
+			var nameServer = await resolver.ResolveAsync<NsRecord>(DomainName.Root, RecordType.Ns);
+			zone.AddRange(nameServer);
+
+		    var aRecordTasks = new List<System.Threading.Tasks.Task<List<ARecord>>>(nameServer.Count);
+		    var aaaaRecordTasks = new List<System.Threading.Tasks.Task<List<AaaaRecord>>>(nameServer.Count);
+		    var dnsKeyRecordTask = resolver.ResolveAsync<DnsKeyRecord>(DomainName.Root, RecordType.DnsKey);
+
+            foreach (var nsRecord in nameServer)
+			{
+			    aRecordTasks.Add(resolver.ResolveAsync<ARecord>(nsRecord.NameServer, RecordType.A));
+			    aaaaRecordTasks.Add(resolver.ResolveAsync<AaaaRecord>(nsRecord.NameServer, RecordType.Aaaa));
+			}
+
+		    var aRecords = await System.Threading.Tasks.Task.WhenAll(aRecordTasks);
+            foreach (var aRecordList in aRecords)
+			{
+				zone.AddRange(aRecordList);
+			}
+
+		    var aaaaRecords = await System.Threading.Tasks.Task.WhenAll(aaaaRecordTasks);
+            foreach (var aaaaRecordList in aaaaRecords)
+		    {
+		        zone.AddRange(aaaaRecordList);
+		    }
+
+            zone.AddRange((await dnsKeyRecordTask).Where(x => x.IsSecureEntryPoint));
+
+			LoadZoneInternal(zone);
+
+			Save(zone);
+		}
+#else
+        public void Update(IDnsResolver resolver)
 		{
 			Zone zone = new Zone(DomainName.Root);
 
@@ -82,6 +119,7 @@ namespace ARSoft.Tools.Net.Dns
 
 			Save(zone);
 		}
+#endif
 
 		private void EnsureInit()
 		{

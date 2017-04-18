@@ -31,6 +31,7 @@ namespace ARSoft.Tools.Net.Dns
 	/// </summary>
 	public static class DnsResolverExtensions
 	{
+#if !NETSTANDARD
 		/// <summary>
 		///   Queries a dns resolver for IP addresses of a host.
 		/// </summary>
@@ -62,6 +63,7 @@ namespace ARSoft.Tools.Net.Dns
 		{
 			return resolver.ResolveHost(DomainName.Parse(name));
 		}
+#endif
 
 		/// <summary>
 		///   Queries a dns resolver for IP addresses of a host as an asynchronous operation.
@@ -97,6 +99,7 @@ namespace ARSoft.Tools.Net.Dns
 			return resolver.ResolveHostAsync(DomainName.Parse(name), token);
 		}
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Queries a dns resolver for reverse name of an IP address.
 		/// </summary>
@@ -108,6 +111,7 @@ namespace ARSoft.Tools.Net.Dns
 			List<PtrRecord> ptrRecords = resolver.Resolve<PtrRecord>(address.GetReverseLookupDomain(), RecordType.Ptr);
 			return ptrRecords.Select(x => x.PointerDomainName).FirstOrDefault();
 		}
+#endif
 
 		/// <summary>
 		///   Queries a dns resolver for reverse name of an IP address as an asynchronous operation.
@@ -122,6 +126,7 @@ namespace ARSoft.Tools.Net.Dns
 			return ptrRecords.Select(x => x.PointerDomainName).FirstOrDefault();
 		}
 
+#if !NETSTANDARD
 		/// <summary>
 		///   Queries a dns resolver for specified records.
 		/// </summary>
@@ -136,6 +141,7 @@ namespace ARSoft.Tools.Net.Dns
 		{
 			return resolver.Resolve<T>(DomainName.Parse(name), recordType, recordClass);
 		}
+#endif
 
 		/// <summary>
 		///   Queries a dns resolver for specified records as an asynchronous operation.
